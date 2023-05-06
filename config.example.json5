@@ -1,0 +1,54 @@
+{
+    // production client information
+    production: {
+        appId: "",
+        apiToken: "",
+        botUid: 8,
+    },
+
+    // development client information
+    development: {
+        appId: "",
+        apiToken: "",
+        botUid: 8,
+        guild: "",
+    },
+
+    // should the bot be in development mode?
+    devMode: true,
+
+    botColors: {
+        successColor: 0x0077ff, // a hex literal of the form 0xRRGGBB
+        errorColor: 0xff0000,
+    },
+
+    maps: [
+        {
+            name: "The Skeld",
+            thumbnailLink: "https://static.wikia.nocookie.net/among-us-wiki/images/1/1f/The_Skeld_logo.png",
+        },
+        {
+            name: "Mira HQ",
+            thumbnailLink: "https://static.wikia.nocookie.net/among-us-wiki/images/e/ec/MIRA_HQ_logo.png",
+        },
+        {
+            name: "Polus",
+            thumbnailLink: "https://static.wikia.nocookie.net/among-us-wiki/images/5/5b/Polus_logo.png",
+        },
+        {
+            name: "The Airship",
+            thumbnailLink: "https://static.wikia.nocookie.net/among-us-wiki/images/e/ec/The_Airship_logo.png",
+        },
+    ],
+
+    gameModes: [
+        {
+            name: "Classic",
+            thumbnailLink: "https://static.wikia.nocookie.net/among-us-wiki/images/5/58/Among_Us_space_banner_redesign.png",
+        },
+        {
+            name: "Hide n' Seek",
+            thumbnailLink: "https://static.wikia.nocookie.net/among-us-wiki/images/a/ae/Hide_n_Seek_splash.png",
+        },
+    ],
+}
