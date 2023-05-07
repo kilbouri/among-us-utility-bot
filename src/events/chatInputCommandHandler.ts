@@ -2,6 +2,7 @@ import {CacheType, Interaction} from "discord.js";
 import {ErrorResponse, SafeDeferReply, SafeReply} from "../helpers/responses";
 import {logger} from "../logger";
 import {ClientType, EventType} from "../types";
+import {ErrorStrings} from "../strings";
 
 const chatInputCommandHandler: EventType = {
     eventName: "interactionCreate",
@@ -16,8 +17,8 @@ const chatInputCommandHandler: EventType = {
             return SafeReply(
                 intr,
                 ErrorResponse(
-                    "Command not found",
-                    `The command '${intr.commandName}' could not be found on this bot... weird.`
+                    ErrorStrings.unknownCommand.short,
+                    ErrorStrings.unknownCommand.detail
                 )
             );
         }
@@ -33,8 +34,8 @@ const chatInputCommandHandler: EventType = {
             return SafeReply(
                 intr,
                 ErrorResponse(
-                    "Oops!",
-                    "An unknown error occured. Try again later or contact an admin."
+                    ErrorStrings.unknownError.short,
+                    ErrorStrings.unknownError.detail
                 )
             );
         }

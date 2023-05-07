@@ -1,43 +1,37 @@
-import {Client, Collection, GatewayIntentBits} from "discord.js";
+import {Client, Collection} from "discord.js";
 import {ClientType, CommandType, EventType} from "./types";
 import {Config, LoadConfig} from "./config";
 import {RegisterCommands} from "./helpers/commandManager";
 import {logger} from "./logger";
-import {readdirSync} from "fs";
-import {format as formatPath} from "path";
+import {LoadDirAs} from "./helpers/lazyModuleLoader";
+import path from "path";
 
 let client: ClientType;
 
 const start = async (): Promise<void> => {
     // Config loading
-    logger.info("Loading config...");
-    LoadConfig("config.json5");
+    const configPath = path.resolve("./config.json5");
+    LoadConfig(configPath);
+    logger.info(`Loaded config from ${configPath}`);
 
     const discordApiInfo = Config.devMode ? Config.development : Config.production;
-
-    // Bot API authentications
-    logger.info("Authenticating with APIs...");
-    client = new Client({
-        intents: [],
-    }) as ClientType;
+    client = new Client({intents: []}) as ClientType;
     client.chatCommands = new Collection<string, CommandType>();
+    logger.info("Created Discord client");
 
     // Command loading
-    const commandFiles = readdirSync("./src/commands") //
-        .filter((name) => name.endsWith(".ts"));
+    const commands = await LoadDirAs<{command: CommandType}>("./src/commands");
+    logger.info(`Loading ${commands.length} commands...`);
 
-    logger.info(`Loading ${commandFiles.length} commands...`);
-    const commandsToRegister = [];
-    for (const file of commandFiles) {
-        const filePath = formatPath({dir: "./commands/", name: file});
-        const {command} = (await import(filePath)) as {command: CommandType};
-
+    const commandsToRegister: CommandType[] = [];
+    for (const {path, value} of commands) {
+        const {command} = value;
         if (!command) {
-            logger.warn(`Failed to load ${file} (no export named 'command')`);
+            logger.warn(`Failed to load ${path} (no export named 'command')`);
             continue;
         }
 
-        logger.debug(`Loaded ${file}`);
+        logger.debug(`Loaded ${path}`);
         client.chatCommands.set(command.data.name, command);
         commandsToRegister.push(command);
     }
@@ -45,23 +39,18 @@ const start = async (): Promise<void> => {
     await RegisterCommands(commandsToRegister, discordApiInfo);
 
     // Event loading
-    const eventFiles = readdirSync("./src/events") //
-        .filter((name) => name.endsWith(".ts"));
-
-    logger.info(`Loading ${commandFiles.length} events...`);
+    const events = await LoadDirAs<{event: EventType}>("./src/events");
+    logger.info(`Loading ${events.length} events...`);
 
     let readyEventRegistered = false;
-    for (const file of eventFiles) {
-        const filePath = formatPath({dir: "./events/", name: file});
-        const {event} = (await import(filePath)) as {event: EventType};
-
+    for (const {path, value} of events) {
+        const {event} = value;
         if (!event) {
-            logger.warn(`Failed to load ${file} (no export named 'event')`);
+            logger.warn(`Failed to load ${path} (no export named 'event')`);
             continue;
         }
 
-        logger.debug(`Loaded ${file} (${event.eventName})`);
-
+        logger.debug(`Loaded ${path} (${event.eventName})`);
         readyEventRegistered ||= event.eventName === "ready";
 
         const eventCallback = (...args: any[]) => event.execute(client, ...args);

@@ -4,8 +4,8 @@ import {
     ChatInputCommandInteraction,
     Client,
     Collection,
-    CommandInteraction,
     SlashCommandBuilder,
+    SlashCommandSubcommandBuilder,
     SlashCommandSubcommandsOnlyBuilder,
 } from "discord.js";
 
@@ -15,6 +15,11 @@ export interface CommandType {
         | SlashCommandSubcommandsOnlyBuilder
         | Omit<SlashCommandBuilder, "addSubcommandGroup" | "addSubcommand">;
     deferMode: "NORMAL" | "EPHEMERAL" | "NO-DEFER";
+    execute: (interaction: ChatInputCommandInteraction<CacheType>) => Promise<any>;
+}
+
+export interface SubcommandType {
+    data: SlashCommandSubcommandBuilder;
     execute: (interaction: ChatInputCommandInteraction<CacheType>) => Promise<any>;
 }
 

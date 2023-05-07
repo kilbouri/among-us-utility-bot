@@ -3,8 +3,26 @@ import {Routes} from "discord-api-types/v10";
 import {Collection} from "discord.js";
 import {CommandType} from "../types";
 
-/** Maps a Guild onto a map from name to ID (global commands are in the "global" guild) */
+/** Maps a Guild onto a map from name to ID */
 export const CommandIDCache = new Collection<string, Collection<string, string>>();
+export const GlobalGuild = "global";
+
+export const ClearCommands = async (options: {
+    guild?: string;
+    apiToken: string;
+    appId: string;
+}) => {
+    const {guild, apiToken, appId} = options;
+
+    const rest = new REST({version: "10"}).setToken(apiToken);
+    const route =
+        guild === undefined
+            ? Routes.applicationCommands(appId)
+            : Routes.applicationGuildCommands(appId, guild);
+
+    await rest.put(route, {body: []});
+    CommandIDCache.set(guild ?? GlobalGuild, new Collection<string, string>());
+};
 
 export const RegisterCommands = async (
     commands: CommandType[],
@@ -14,13 +32,13 @@ export const RegisterCommands = async (
         appId: string;
     }
 ): Promise<number> => {
-    const {guild, apiToken: api_token, appId: app_id} = options;
+    const {guild, apiToken, appId} = options;
 
-    const rest = new REST({version: "10"}).setToken(api_token);
+    const rest = new REST({version: "10"}).setToken(apiToken);
     const route =
         guild === undefined
-            ? Routes.applicationCommands(app_id)
-            : Routes.applicationGuildCommands(app_id, guild);
+            ? Routes.applicationCommands(appId)
+            : Routes.applicationGuildCommands(appId, guild);
 
     const cmdArr = commands.map((command) => command.data.toJSON());
     const response = (await rest.put(route, {body: cmdArr})) as {
@@ -28,10 +46,10 @@ export const RegisterCommands = async (
         name: string;
     }[];
 
-    let cache = CommandIDCache.get(guild ?? "global");
+    let cache = CommandIDCache.get(guild ?? GlobalGuild);
     if (!cache) {
         let newCache = new Collection<string, string>();
-        CommandIDCache.set(guild ?? "global", newCache);
+        CommandIDCache.set(guild ?? GlobalGuild, newCache);
         cache = newCache;
     }
 

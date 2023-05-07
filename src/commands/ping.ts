@@ -1,5 +1,5 @@
 import {SlashCommandBooleanOption, SlashCommandBuilder} from "@discordjs/builders";
-import {CacheType, ChatInputCommandInteraction, CommandInteraction} from "discord.js";
+import {CacheType, ChatInputCommandInteraction} from "discord.js";
 import {ResponseEmbed, SafeReply} from "../helpers/responses";
 import {CommandType} from "../types";
 import {freemem, totalmem} from "os";
@@ -14,16 +14,11 @@ const pingModule: CommandType = {
                 .setName("detailed")
                 .setDescription("Show extended statistics")
                 .setRequired(false)
-        )
-        .addBooleanOption(
-            new SlashCommandBooleanOption()
-                .setName("ephemeral")
-                .setDescription("When false, statistics will be visible to everyone")
-                .setRequired(false)
         ),
     deferMode: "NO-DEFER",
     execute: async (intr: ChatInputCommandInteraction<CacheType>) => {
         let uptime = intr.client.uptime!;
+
         const ms = uptime % 1000;
         const secs = (uptime = Math.floor(uptime / 1000)) % 60;
         const mins = (uptime = Math.floor(uptime / 60)) % 60;
@@ -39,7 +34,7 @@ const pingModule: CommandType = {
         const embed = ResponseEmbed().setTitle("Pong!");
 
         embed.addFields(
-            {name: "Ping", value: `${intr.client.ws.ping}ms`},
+            {name: "API Latency", value: `${Math.round(intr.client.ws.ping)}ms`},
             {name: "Uptime", value: `${dayStr}${hrStr}${minStr}${secStr}${msStr}`}
         );
 
@@ -59,7 +54,7 @@ const pingModule: CommandType = {
         }
 
         return SafeReply(intr, {
-            ephemeral: intr.options.getBoolean("ephemeral") ?? false,
+            ephemeral: true,
             embeds: [embed],
         });
     },
