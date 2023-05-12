@@ -5,7 +5,6 @@ import {parse as parseJSON5} from "json5";
 interface ModeType {
     apiToken: string;
     appId: string;
-    botUid: number;
     guild?: string;
 }
 

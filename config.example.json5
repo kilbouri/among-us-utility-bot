@@ -1,27 +1,27 @@
 {
-    // production client information
+    // production client information (commands rolled out globally, up to 1 hour propogation delay)
     production: {
         appId: "",
         apiToken: "",
-        botUid: 8,
     },
 
     // development client information
     development: {
         appId: "",
         apiToken: "",
-        botUid: 8,
         guild: "",
     },
 
     // should the bot be in development mode?
     devMode: true,
 
+    // Colors for bot embed highlights
     botColors: {
         successColor: 0x0077ff, // a hex literal of the form 0xRRGGBB
         errorColor: 0xff0000,
     },
 
+    // An array of maps that `/random map` should chose from
     maps: [
         {
             name: "The Skeld",
@@ -41,6 +41,7 @@
         },
     ],
 
+    // An array of maps that `/random mode` should chose from
     gameModes: [
         {
             name: "Classic",
