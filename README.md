@@ -10,9 +10,9 @@ A simple Discord bot that provides utilities for groups looking to play Among Us
 
 ### Screenshots
 
-| Mode Selection                             | Map Selection                             |
-| ------------------------------------------ | ----------------------------------------- |
-| ![Alt text](readme_images\random_mode.png) | ![Alt text](readme_images\random_map.png) |
+| Random Mode                                                       | Random Map                                                      |
+| ----------------------------------------------------------------- | --------------------------------------------------------------- |
+| ![Random mode choice in Discord](./readme_images/random_mode.png) | ![Random map choice in Discord](./readme_images/random_map.png) |
 
 
 ## Build & Run
