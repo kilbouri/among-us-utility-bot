@@ -12,8 +12,12 @@ const chatInputCommandHandler: EventType = {
             return;
         }
 
-        const command = client.chatCommands.get(intr.commandName);
+        const commandName = intr.commandName;
+        const command = client.chatCommands.get(commandName);
         if (!command) {
+            logger.warn(
+                `Received chat interaction for unknown command: ${intr.commandName}`
+            );
             return SafeReply(
                 intr,
                 ErrorResponse(
@@ -21,6 +25,13 @@ const chatInputCommandHandler: EventType = {
                     ErrorStrings.unknownCommand.detail
                 )
             );
+        }
+
+        const subcommand = intr.options.getSubcommand(false);
+        if (subcommand) {
+            logger.info(`Interaction for '/${commandName} ${subcommand}'`);
+        } else {
+            logger.info(`Interaction for '/${commandName}'`);
         }
 
         try {

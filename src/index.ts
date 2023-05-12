@@ -3,7 +3,7 @@ import {ClientType, CommandType, EventType} from "./types";
 import {Config, LoadConfig} from "./config";
 import {RegisterCommands} from "./helpers/commandManager";
 import {logger} from "./logger";
-import {LoadDirAs} from "./helpers/lazyModuleLoader";
+import {LoadDirAs, SourceRootDir} from "./helpers/lazyModuleLoader";
 import path from "path";
 
 let client: ClientType;
@@ -20,7 +20,9 @@ const start = async (): Promise<void> => {
     logger.info("Created Discord client");
 
     // Command loading
-    const commands = await LoadDirAs<{command: CommandType}>("./src/commands");
+    const commandsDir = path.join(SourceRootDir, "commands");
+    const commands = await LoadDirAs<{command: CommandType}>(commandsDir);
+    logger.info(`Searching ${commandsDir} for commands...`);
     logger.info(`Loading ${commands.length} commands...`);
 
     const commandsToRegister: CommandType[] = [];
@@ -39,7 +41,9 @@ const start = async (): Promise<void> => {
     await RegisterCommands(commandsToRegister, discordApiInfo);
 
     // Event loading
-    const events = await LoadDirAs<{event: EventType}>("./src/events");
+    const eventsDir = path.join(SourceRootDir, "events");
+    const events = await LoadDirAs<{event: EventType}>(eventsDir);
+    logger.info(`Searching ${eventsDir} for events...`);
     logger.info(`Loading ${events.length} events...`);
 
     let readyEventRegistered = false;
