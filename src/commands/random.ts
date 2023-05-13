@@ -5,7 +5,6 @@ import {RandomMapSubcommand} from "./random/map";
 import {RandomGameModeSubcommand} from "./random/mode";
 import {RandomChoiceSubcommand} from "./random/choice";
 import {ErrorStrings} from "../strings";
-import {logger} from "../logger";
 
 const randomMapModule: CommandType = {
     data: new SlashCommandBuilder()
