@@ -1,6 +1,7 @@
 import {readFileSync} from "fs";
 import {logger} from "./logger";
 import {parse as parseJSON5} from "json5";
+import {GuildResolvable, RoleResolvable} from "discord.js";
 
 interface ModeType {
     apiToken: string;
@@ -31,6 +32,23 @@ interface ConfigType {
         name: string;
         thumbnailLink: string;
     }[];
+
+    weeklyEvent: {
+        creation: {
+            guild: string;
+            channel: string;
+            cronTimer: string;
+            scheduledTimeUtc: {
+                dayOfWeek: number;
+                hour: number;
+                minute: number;
+            };
+        };
+        eventInfo: {
+            name: string;
+            description?: string;
+        };
+    };
 }
 
 let Config: ConfigType;

@@ -21,6 +21,28 @@
         errorColor: 0xff0000,
     },
 
+    weeklyEvent: {
+        creation: {
+            guild: "",
+            channel: "",
+
+            // When should the bot schedule the next event? (next event is based on when the scheduler runs)
+            cronTimer: "0 0 0 * * 6", // 00:00 Saturday, each week
+
+            // When in each week should the bot place the event?
+            // Set to 9:30pm on Fridays, EST (converted to UTC)
+            scheduledTimeUtc: {
+                dayOfWeek: 6, // Sunday = 0, Monday = 1...
+                hour: 1,
+                minute: 30,
+            },
+        },
+        eventInfo: {
+            name: "Weekly Among Us",
+            description: null,
+        },
+    },
+
     // An array of maps that `/random map` should chose from
     maps: [
         {

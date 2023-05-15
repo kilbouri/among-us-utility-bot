@@ -29,6 +29,11 @@ export interface EventType {
     execute: (client: ClientType, ...args: any[]) => Promise<any>;
 }
 
+export interface CronJobType {
+    cronTimer: string;
+    execute: (client: ClientType, timerInfo: Date | "init" | "manual") => Promise<any>;
+}
+
 export interface ButtonAction {
     execute: (interaction: ButtonInteraction<CacheType>) => Promise<any>;
 }

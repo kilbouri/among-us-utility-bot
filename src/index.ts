@@ -1,9 +1,10 @@
 import {Client, Collection} from "discord.js";
-import {ClientType, CommandType, EventType} from "./types";
+import {ClientType, CommandType, CronJobType, EventType} from "./types";
 import {Config, LoadConfig} from "./config";
 import {RegisterCommands} from "./helpers/commandManager";
 import {logger} from "./logger";
 import {LoadDirAs, SourceRootDir} from "./helpers/lazyModuleLoader";
+import cron from "node-cron";
 import path from "path";
 
 let client: ClientType;
@@ -21,8 +22,9 @@ const start = async (): Promise<void> => {
 
     // Command loading
     const commandsDir = path.join(SourceRootDir, "commands");
-    const commands = await LoadDirAs<{command: CommandType}>(commandsDir);
     logger.info(`Searching ${commandsDir} for commands...`);
+
+    const commands = await LoadDirAs<{command: CommandType}>(commandsDir);
     logger.info(`Loading ${commands.length} commands...`);
 
     const commandsToRegister: CommandType[] = [];
@@ -42,8 +44,9 @@ const start = async (): Promise<void> => {
 
     // Event loading
     const eventsDir = path.join(SourceRootDir, "events");
-    const events = await LoadDirAs<{event: EventType}>(eventsDir);
     logger.info(`Searching ${eventsDir} for events...`);
+
+    const events = await LoadDirAs<{event: EventType}>(eventsDir);
     logger.info(`Loading ${events.length} events...`);
 
     let readyEventRegistered = false;
@@ -70,11 +73,39 @@ const start = async (): Promise<void> => {
         process.exit();
     }
 
-    if (Config.devMode) {
-        client.on("error", logger.error);
-        client.on("warn", logger.warn);
+    // Cron job loading
+    const cronDir = path.join(SourceRootDir, "cron");
+    logger.info(`Searching ${cronDir} for cron jobs...`);
+
+    const jobs = await LoadDirAs<{cronJob: CronJobType}>(cronDir);
+    logger.info(`Loading ${jobs.length} cron jobs...`);
+
+    for (const {path, value} of jobs) {
+        const {cronJob} = value;
+        if (!cronJob) {
+            logger.warn(`Failed to load ${path} (no export named 'cronJob')`);
+            continue;
+        }
+
+        if (!cron.validate(cronJob.cronTimer)) {
+            logger.warn(`Failed to load ${path} (invalid cron timer)`);
+            continue;
+        }
+
+        logger.debug(`Loaded ${path} (${cronJob.cronTimer})`);
+        cron.schedule(
+            cronJob.cronTimer,
+            (timerInfo) => {
+                cronJob.execute(client, timerInfo);
+            },
+            {
+                timezone: "utc",
+            }
+        );
     }
 
+    client.on("error", logger.error);
+    client.on("warn", logger.warn);
     await client.login(discordApiInfo.apiToken);
 };
 

@@ -13,8 +13,10 @@
     },
     "dependencies": {
         "@types/node": "^20.1.0",
+        "@types/node-cron": "^3.0.7",
         "discord.js": "^14.10.2",
         "json5": "^2.2.3",
+        "node-cron": "^3.0.2",
         "pino": "^8.12.1",
         "shutdown-handler": "^1.0.1",
         "systeminformation": "^5.17.12"
